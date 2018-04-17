@@ -1,28 +1,30 @@
 package kr.ac.jejunu;
 
+import javax.sql.DataSource;
 import java.sql.*;
 
 public  class ProductDao {
-    private final ConnectionMaker connectionMaker;
+    private final DataSource dataSource;
 
-    public ProductDao(ConnectionMaker connectionMaker){
-        this.connectionMaker=connectionMaker;
+    public ProductDao(DataSource dataSource){
+        this.dataSource=dataSource;
     }
     public Product get(Long id) throws ClassNotFoundException, SQLException {
         Connection connection=null;
         PreparedStatement preparedStatement=null;
         ResultSet resultSet=null;
-        Product product;
+        Product product = null;
         try {
-            connection = connectionMaker.getConnection();
+            connection = dataSource.getConnection();
             preparedStatement = connection.prepareStatement("select * from product where id = ?");
             preparedStatement.setLong(1, id);
             resultSet = preparedStatement.executeQuery();
-            resultSet.next();
-            product = new Product();
-            product.setId(resultSet.getLong("id"));
-            product.setTitle(resultSet.getString("title"));
-            product.setPrice(resultSet.getInt("price"));
+            if (resultSet.next()) {
+                product = new Product();
+                product.setId(resultSet.getLong("id"));
+                product.setTitle(resultSet.getString("title"));
+                product.setPrice(resultSet.getInt("price"));
+            }
         } finally {
             if(resultSet != null)
                 try {
@@ -51,7 +53,7 @@ public  class ProductDao {
         ResultSet resultSet=null;
         Long id;
         try {
-            connection = connectionMaker.getConnection();
+            connection = dataSource.getConnection();
             preparedStatement = connection.prepareStatement("insert into product(title, price) values(?, ?)");
             preparedStatement.setString(1, product.getTitle());
             preparedStatement.setInt(2, product.getPrice());
