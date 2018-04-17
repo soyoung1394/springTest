@@ -12,12 +12,10 @@ import static org.junit.Assert.assertTrue;
 
 public class ProductDaoTest {
     private ProductDao productDao;
-    private ProductDao hanraProductDao;
 
     @Before
     public void setup() {
-        productDao=new JejuProductDao();
-        hanraProductDao=new HanraProductDao();
+        productDao=new ProductDao();
     }
 
     @Test
@@ -45,28 +43,5 @@ public class ProductDaoTest {
         assertThat(insertedProduct.getPrice(),is(product.getPrice()));
     }
 
-    @Test
-    public void hanraGet() throws SQLException, ClassNotFoundException {
-        Long id = 1L;
-        String title = "제주감귤";
-        Integer price = 15000;
 
-        Product product = hanraProductDao.get(id);
-        assertEquals(id, product.getId());
-        assertEquals(title, product.getTitle());
-        assertEquals(price, product.getPrice());
-    }
-
-    @Test
-    public void hanraAdd() throws SQLException, ClassNotFoundException{
-        Product product=new Product();
-        product.setTitle("AA");
-        product.setPrice(200);
-        long id=hanraProductDao.insert(product);
-
-        Product insertedProduct = hanraProductDao.get(id);
-        assertThat(insertedProduct.getId(),is(id));
-        assertThat(insertedProduct.getTitle(),is(product.getTitle()));
-        assertThat(insertedProduct.getPrice(),is(product.getPrice()));
-    }
 }
