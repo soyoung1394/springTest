@@ -38,8 +38,7 @@ public class ProductDaoTest {
     @Test
     public void add() throws SQLException, ClassNotFoundException{
         Product product=new Product();
-        product.setTitle("AA");
-        product.setPrice(200);
+        insertProductTest(product);
         long id=productDao.insert(product);
 
         Product insertedProduct = productDao.get(id);
@@ -47,6 +46,39 @@ public class ProductDaoTest {
         assertThat(insertedProduct.getTitle(),is(product.getTitle()));
         assertThat(insertedProduct.getPrice(),is(product.getPrice()));
     }
+    @Test
+    public void update() throws SQLException, ClassNotFoundException{
+        Product product=new Product();
+        Long id=insertProductTest(product);
 
+        product.setId(id);
+        product.setTitle("bb");
+        product.setPrice(1234);
+        productDao.update(product);
+
+        Product updatedProduct = productDao.get(id);
+
+        assertThat(updatedProduct.getId(),is(product.getId()));
+        assertThat(updatedProduct.getTitle(),is(product.getTitle()));
+        assertThat(updatedProduct.getPrice(),is(product.getPrice()));
+    }
+
+    private Long insertProductTest(Product product) throws SQLException, ClassNotFoundException {
+        product.setTitle("AA");
+        product.setPrice(200);
+        return productDao.insert(product);
+    }
+
+    @Test
+    public void delete() throws SQLException, ClassNotFoundException{
+        Product product=new Product();
+        Long id=insertProductTest(product);
+
+
+       productDao.delete(id);
+
+       Product deletedProduct=productDao.get(id);
+       assertThat(deletedProduct,nullValue());
+    }
 
 }

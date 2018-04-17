@@ -6,13 +6,14 @@ import java.sql.*;
 public  class ProductDao {
     private final DataSource dataSource;
 
-    public ProductDao(DataSource dataSource){
-        this.dataSource=dataSource;
+    public ProductDao(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
+
     public Product get(Long id) throws ClassNotFoundException, SQLException {
-        Connection connection=null;
-        PreparedStatement preparedStatement=null;
-        ResultSet resultSet=null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
         Product product = null;
         try {
             connection = dataSource.getConnection();
@@ -26,19 +27,19 @@ public  class ProductDao {
                 product.setPrice(resultSet.getInt("price"));
             }
         } finally {
-            if(resultSet != null)
+            if (resultSet != null)
                 try {
                     resultSet.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-            if(preparedStatement != null)
+            if (preparedStatement != null)
                 try {
                     preparedStatement.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-            if(connection != null)
+            if (connection != null)
                 try {
                     connection.close();
                 } catch (SQLException e) {
@@ -47,10 +48,11 @@ public  class ProductDao {
         }
         return product;
     }
-    public Long insert(Product product) throws SQLException, ClassNotFoundException{
-        Connection connection=null;
-        PreparedStatement preparedStatement=null;
-        ResultSet resultSet=null;
+
+    public Long insert(Product product) throws SQLException, ClassNotFoundException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
         Long id;
         try {
             connection = dataSource.getConnection();
@@ -58,24 +60,24 @@ public  class ProductDao {
             preparedStatement.setString(1, product.getTitle());
             preparedStatement.setInt(2, product.getPrice());
             preparedStatement.executeUpdate();
-            preparedStatement=connection.prepareStatement("select last_insert_id()");
+            preparedStatement = connection.prepareStatement("select last_insert_id()");
             resultSet = preparedStatement.executeQuery();
             resultSet.next();
             id = resultSet.getLong(1);
         } finally {
-            if(resultSet != null)
+            if (resultSet != null)
                 try {
                     resultSet.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-            if(preparedStatement != null)
+            if (preparedStatement != null)
                 try {
                     preparedStatement.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-            if(connection != null)
+            if (connection != null)
                 try {
                     connection.close();
                 } catch (SQLException e) {
@@ -83,5 +85,56 @@ public  class ProductDao {
                 }
         }
         return id;
+    }
+
+    public void update(Product product) throws SQLException, ClassNotFoundException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            connection = dataSource.getConnection();
+            preparedStatement = connection.prepareStatement("update product set title = ?, price = ? where id = ?");
+            preparedStatement.setString(1, product.getTitle());
+            preparedStatement.setInt(2, product.getPrice());
+            preparedStatement.setLong(3, product.getId());
+
+                preparedStatement.executeUpdate();
+
+        } finally {
+            if (preparedStatement != null)
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            if (connection != null)
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+        }
+    }
+    public void delete(Long id) throws ClassNotFoundException, SQLException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            connection = dataSource.getConnection();
+            preparedStatement = connection.prepareStatement("delete from product where id = ?");
+            preparedStatement.setLong(1, id);
+            preparedStatement.executeUpdate();
+        } finally {
+            if (preparedStatement != null)
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            if (connection != null)
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+        }
     }
 }
