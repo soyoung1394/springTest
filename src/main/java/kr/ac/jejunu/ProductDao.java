@@ -1,6 +1,5 @@
 package kr.ac.jejunu;
 
-import javax.sql.DataSource;
 import java.sql.*;
 
 public class ProductDao {
@@ -10,19 +9,45 @@ public class ProductDao {
         this.jdbcContext = jdbcContext;
     }
     public Product get(Long id) throws ClassNotFoundException, SQLException {
-        StatementStrategy statementStrategy = new GetStatementStrategy(id);
+        Long id1 = id;
+        StatementStrategy statementStrategy = connection -> {
+            PreparedStatement preparedStatement = connection.prepareStatement("select * from product where id = ?");
+            preparedStatement.setLong(1, id);
+            return preparedStatement;
+        } ;
         return jdbcContext.jdbcContextForGet(statementStrategy);
     }
     public Long insert(Product product) throws SQLException, ClassNotFoundException {
-        StatementStrategy statementStrategy = new InsertStatementStrategy(product);
+        Product product1 = product;
+        StatementStrategy statementStrategy = connection -> {
+            PreparedStatement preparedStatement = connection.prepareStatement("insert into product(title, price) values(?, ?)", Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setString(1, product.getTitle());
+            preparedStatement.setInt(2, product.getPrice());
+            return preparedStatement;
+        } ;
+
+
         return jdbcContext.jdbcContextForInsert(statementStrategy);
     }
     public void update(Product product) throws SQLException, ClassNotFoundException {
-        StatementStrategy statementStrategy = new UpdateStatementStrategy(product);
+        Product product1 = product;
+        StatementStrategy statementStrategy = connection -> {
+            PreparedStatement preparedStatement = connection.prepareStatement("update product set title = ?, price = ? where id = ?");
+            preparedStatement.setString(1, product.getTitle());
+            preparedStatement.setInt(2, product.getPrice());
+            preparedStatement.setLong(3, product.getId());
+            return  preparedStatement;
+        };
         jdbcContext.jdbcContextForUpdate(statementStrategy);
     }
     public void delete(Long id) throws ClassNotFoundException, SQLException {
-        StatementStrategy statementStrategy = new DeleteStatementStrategy(id);
+        Long id1 = id;
+        StatementStrategy statementStrategy = connection -> {
+            PreparedStatement preparedStatement = connection.prepareStatement("delete from product where id = ?");
+            preparedStatement.setLong(1, id);
+            return preparedStatement;
+        };
+
         jdbcContext.jdbcContextForUpdate(statementStrategy);
     }
 
